@@ -1,479 +1,309 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Kelas - QR Code</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+    <title>Quiz Kelas - QR Code</title>
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-    font-family:Arial,sans-serif;
-    background:linear-gradient(135deg,#4f46e5,#7c3aed);
-    min-height:100vh;padding:25px 15px
-}
-.container{width:100%;max-width:700px;margin:auto}
-h1{color:white;text-align:center;margin:10px 0 8px}
-.subtitle{color:#eee;text-align:center;margin-bottom:20px}
-.card{
-    background:white;border-radius:18px;padding:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,.2);margin-bottom:18px
-}
-h2{color:#333;text-align:center;margin-bottom:20px}
-label{display:block;font-weight:bold;color:#444;margin:14px 0 7px}
-input,textarea,select{
-    width:100%;border:1px solid #ccc;border-radius:9px;
-    padding:12px;font-size:15px;font-family:inherit
-}
-textarea{min-height:90px;resize:vertical}
-input:focus,textarea:focus,select:focus{outline:none;border-color:#4f46e5}
-button{
-    width:100%;border:0;border-radius:9px;padding:13px;margin-top:12px;
-    background:#4f46e5;color:white;font-size:15px;font-weight:bold;cursor:pointer
-}
-button:hover{background:#3730a3}
-button:disabled{opacity:.55;cursor:not-allowed}
-.secondary{background:#64748b}.secondary:hover{background:#475569}
-.danger{background:#dc2626}.danger:hover{background:#b91c1c}
-.success{background:#16a34a}.success:hover{background:#15803d}
-.hidden{display:none!important}
-.info{
-    background:#eef2ff;border-left:4px solid #4f46e5;padding:12px;
-    border-radius:8px;color:#3730a3;font-size:14px;margin-bottom:15px;line-height:1.5
-}
-.question-box{
-    border:1px solid #ddd;border-radius:12px;padding:18px;
-    margin-top:15px;background:#fafafa
-}
-.question-title{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.question-title h3{color:#333;font-size:17px}
-.question-number{
-    background:#4f46e5;color:white;border-radius:20px;padding:6px 10px;
-    font-size:13px;white-space:nowrap
-}
-.remove-btn{width:auto;margin:12px 0 0;padding:8px 10px;font-size:12px}
-.quiz-code{
-    text-align:center;font-size:30px;font-weight:bold;letter-spacing:5px;
-    background:#f1f5f9;padding:14px;border-radius:10px;margin:15px 0
-}
-#qrcode{display:flex;justify-content:center;align-items:center;margin:20px auto;min-height:240px}
-.small{font-size:13px;color:#666;text-align:center;line-height:1.5}
-.topbar{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px}
-.topbar span{font-weight:bold;color:#475569}
-.progress{height:9px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin:10px 0 20px}
-.progress-bar{height:100%;width:0;background:#4f46e5;transition:width .2s}
-.answer-option{
-    width:100%;text-align:left;background:#f8fafc;color:#222;
-    border:2px solid #e2e8f0;margin-top:10px
-}
-.answer-option:hover{background:#eef2ff;border-color:#4f46e5}
-.answer-option.selected{background:#e0e7ff;border-color:#4f46e5}
-.result-score{text-align:center;font-size:44px;font-weight:bold;color:#4f46e5;margin:15px 0}
-.result-text{text-align:center;font-size:18px;color:#333;line-height:1.6}
-@media(max-width:500px){.card{padding:18px}.quiz-code{font-size:25px}}
-</style>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <!-- QR Code -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+
 <div class="container">
+
     <h1>🎓 Quiz Kelas</h1>
     <p class="subtitle">Quiz pilihan ganda dengan QR Code</p>
 
-    <!-- ADMIN -->
+
+    <!-- ================= ADMIN ================= -->
+
     <section id="adminPage" class="card">
+
         <h2>📝 Buat Quiz</h2>
 
         <div class="info">
-            Kamu dapat membuat <b>1 sampai 20 pertanyaan</b>.
-            QR Code akan otomatis memakai alamat website yang sedang dibuka.
-            Jadi jika website sudah di GitHub Pages, HP peserta bisa langsung membukanya.
+            <b>Cara kerja:</b><br>
+            1. Buat pertanyaan di bawah.<br>
+            2. Klik Generate Quiz.<br>
+            3. Bagikan QR Code kepada mahasiswa.<br>
+            4. Mahasiswa scan QR dan langsung masuk ke quiz.<br>
+            5. Nilai mahasiswa otomatis masuk ke Firebase.
         </div>
 
         <label>Judul Quiz</label>
-        <input id="quizTitle" type="text" placeholder="Contoh: Quiz Jaringan Komputer">
+        <input
+            id="quizTitle"
+            type="text"
+            placeholder="Contoh: Quiz Jaringan Komputer"
+        >
 
         <div id="questionList"></div>
 
-        <button onclick="tambahPertanyaan()">➕ Tambah Pertanyaan</button>
-        <button class="success" onclick="generateQuiz()">🚀 Generate Quiz & QR Code</button>
+        <button onclick="tambahPertanyaan()">
+            ➕ Tambah Pertanyaan
+        </button>
+
+        <button class="success" onclick="generateQuiz()">
+            🚀 Generate Quiz & QR Code
+        </button>
+
     </section>
 
-    <!-- QR -->
+
+    <!-- ================= QR PAGE ================= -->
+
     <section id="qrPage" class="card hidden">
+
         <h2>🎉 Quiz Siap</h2>
-        <p class="small">Kode Quiz:</p>
-        <div class="quiz-code" id="quizCode">------</div>
 
         <p class="small">
-            Scan QR menggunakan HP untuk masuk ke quiz.
+            Kode Quiz:
+        </p>
+
+        <div class="quiz-code" id="quizCode">
+            ------
+        </div>
+
+        <p class="small">
+            Scan QR Code menggunakan HP mahasiswa.
         </p>
 
         <div id="qrcode"></div>
 
-        <button onclick="salinLink()">📋 Salin Link Quiz</button>
-        <button class="secondary" onclick="kembaliBuatQuiz()">✏️ Buat/Edit Quiz Lagi</button>
+        <button onclick="salinLink()">
+            📋 Salin Link Quiz
+        </button>
 
-        <p class="small" style="margin-top:12px">
-            QR harus dibuat saat halaman dibuka dari alamat GitHub Pages,
-            bukan dari file lokal <b>file://</b>.
+        <button class="success" onclick="bukaDashboard()">
+            📊 Lihat Nilai & Ranking
+        </button>
+
+        <button class="secondary" onclick="kembaliBuatQuiz()">
+            ✏️ Buat Quiz Lagi
+        </button>
+
+        <p class="small note">
+            QR Code berisi alamat GitHub Pages quiz.
+            Mahasiswa tidak perlu mengetik kode secara manual.
         </p>
+
     </section>
 
-    <!-- PESERTA -->
+
+    <!-- ================= JOIN PAGE ================= -->
+
     <section id="joinPage" class="card hidden">
+
         <h2>👋 Ikuti Quiz</h2>
 
         <div class="info">
-            <b id="joinQuizTitle">Quiz Kelas</b><br>
-            Kode: <span id="joinQuizCode">------</span>
+
+            <b id="joinQuizTitle">
+                Quiz Kelas
+            </b>
+
+            <br>
+
+            Kode:
+            <span id="joinQuizCode">
+                ------
+            </span>
+
         </div>
 
         <label>Nama Peserta</label>
-        <input id="participantName" type="text" placeholder="Masukkan nama kamu">
 
-        <button onclick="mulaiQuiz()">▶️ Mulai Quiz</button>
+        <input
+            id="participantName"
+            type="text"
+            placeholder="Masukkan nama kamu"
+            maxlength="50"
+        >
+
+        <button onclick="mulaiQuiz()">
+            ▶️ Mulai Quiz
+        </button>
+
     </section>
 
-    <!-- SOAL -->
+
+    <!-- ================= QUIZ PAGE ================= -->
+
     <section id="quizPage" class="card hidden">
+
         <div class="topbar">
-            <span id="questionCounter">Pertanyaan 1 dari 1</span>
-            <span id="scoreLive">Skor: 0</span>
+
+            <span id="questionCounter">
+                Pertanyaan 1 dari 1
+            </span>
+
+            <span id="scoreLive">
+                Skor: 0
+            </span>
+
         </div>
 
         <div class="progress">
-            <div id="progressBar" class="progress-bar"></div>
+
+            <div
+                id="progressBar"
+                class="progress-bar">
+            </div>
+
         </div>
 
-        <h2 id="questionText" style="text-align:left">Pertanyaan</h2>
+        <h2
+            id="questionText"
+            class="question-text">
+            Pertanyaan
+        </h2>
 
         <div id="answers"></div>
 
-        <button id="nextButton" onclick="soalBerikutnya()" disabled>Berikutnya ➡️</button>
+        <button
+            id="nextButton"
+            onclick="soalBerikutnya()"
+            disabled>
+
+            Berikutnya ➡️
+
+        </button>
+
     </section>
 
-    <!-- HASIL -->
+
+    <!-- ================= RESULT PAGE ================= -->
+
     <section id="resultPage" class="card hidden">
+
         <h2>🏆 Hasil Quiz</h2>
 
         <p class="result-text">
-            Peserta:<br><b id="resultName"></b>
+
+            Peserta:
+
+            <br>
+
+            <b id="resultName"></b>
+
         </p>
 
-        <div class="result-score" id="finalScore">0</div>
+        <div
+            class="result-score"
+            id="finalScore">
 
-        <p class="result-text" id="resultDetail"></p>
+            0
 
-        <button onclick="kembaliKeAwal()">🔄 Kembali</button>
-    </section>
-</div>
-
-<script>
-let quiz={id:"",title:"",questions:[]};
-let currentQuestion=0;
-let selectedAnswer=null;
-let participant="";
-let score=0;
-let generatedQuizLink="";
-
-const MAX_QUESTIONS=20;
-
-function buatTemplatePertanyaan(nomor){
-    return `
-    <div class="question-box">
-        <div class="question-title">
-            <h3>Pertanyaan ${nomor}</h3>
-            <span class="question-number">Soal ${nomor}</span>
         </div>
 
-        <label>Pertanyaan</label>
-        <textarea class="q-text" placeholder="Masukkan pertanyaan..."></textarea>
+        <p
+            class="result-text"
+            id="resultDetail">
+        </p>
 
-        <label>Pilihan A</label>
-        <input class="q-a" type="text" placeholder="Jawaban A">
-
-        <label>Pilihan B</label>
-        <input class="q-b" type="text" placeholder="Jawaban B">
-
-        <label>Pilihan C</label>
-        <input class="q-c" type="text" placeholder="Jawaban C">
-
-        <label>Pilihan D</label>
-        <input class="q-d" type="text" placeholder="Jawaban D">
-
-        <label>Jawaban Benar</label>
-        <select class="q-correct">
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-        </select>
-
-        <button class="danger remove-btn" onclick="hapusPertanyaan(this)">
-            🗑️ Hapus Pertanyaan
+        <button onclick="kembaliKeAwal()">
+            🔄 Kembali
         </button>
-    </div>`;
-}
 
-function tambahPertanyaan(){
-    const list=document.getElementById("questionList");
-    const jumlah=list.querySelectorAll(".question-box").length;
+    </section>
 
-    if(jumlah>=MAX_QUESTIONS){
-        alert("Maksimal 20 pertanyaan.");
-        return;
-    }
 
-    list.insertAdjacentHTML("beforeend",buatTemplatePertanyaan(jumlah+1));
-}
+    <!-- ================= DASHBOARD ================= -->
 
-function hapusPertanyaan(button){
-    button.closest(".question-box").remove();
+    <section id="dashboardPage" class="card hidden">
 
-    document.querySelectorAll(".question-box").forEach((box,index)=>{
-        box.querySelector("h3").textContent="Pertanyaan "+(index+1);
-        box.querySelector(".question-number").textContent="Soal "+(index+1);
-    });
-}
+        <h2>📊 Dashboard Nilai</h2>
 
-function ambilPertanyaanDariForm(){
-    const boxes=document.querySelectorAll(".question-box");
-    const questions=[];
+        <div class="info">
 
-    boxes.forEach(box=>{
-        questions.push({
-            question:box.querySelector(".q-text").value.trim(),
-            A:box.querySelector(".q-a").value.trim(),
-            B:box.querySelector(".q-b").value.trim(),
-            C:box.querySelector(".q-c").value.trim(),
-            D:box.querySelector(".q-d").value.trim(),
-            correct:box.querySelector(".q-correct").value
-        });
-    });
+            <b id="dashboardTitle">
+                Quiz Kelas
+            </b>
 
-    return questions;
-}
+            <br>
 
-function generateQuiz(){
-    const title=document.getElementById("quizTitle").value.trim()||"Quiz Kelas";
-    const questions=ambilPertanyaanDariForm();
+            Kode:
+            <span id="dashboardCode">
+                ------
+            </span>
 
-    if(questions.length===0){
-        alert("Tambahkan minimal 1 pertanyaan.");
-        return;
-    }
+        </div>
 
-    for(let i=0;i<questions.length;i++){
-        const q=questions[i];
-        if(!q.question||!q.A||!q.B||!q.C||!q.D){
-            alert("Pertanyaan nomor "+(i+1)+" belum lengkap.");
-            return;
-        }
-    }
+        <div class="dashboard-info">
 
-    quiz={
-        id:Math.random().toString(36).substring(2,8).toUpperCase(),
-        title:title,
-        questions:questions
-    };
+            <div>
+                👥 Peserta
+                <strong id="jumlahPeserta">0</strong>
+            </div>
 
-    /*
-      PENTING:
-      Data quiz dimasukkan ke URL QR dan dikompres.
-      Dengan begitu HP peserta tidak membutuhkan localStorage laptop.
-    */
-    const compressed=LZString.compressToEncodedURIComponent(JSON.stringify(quiz));
+            <div>
+                🏆 Nilai Tertinggi
+                <strong id="nilaiTertinggi">0</strong>
+            </div>
 
-    /*
-      window.location.origin + pathname akan otomatis menjadi:
-      https://username.github.io/nama-repository/
-      jika halaman dibuka dari GitHub Pages.
-    */
-    const baseUrl=window.location.origin+window.location.pathname;
+        </div>
 
-    generatedQuizLink=
-        baseUrl+
-        "?quiz="+encodeURIComponent(quiz.id)+
-        "&data="+compressed;
+        <div class="table-container">
 
-    document.getElementById("quizCode").textContent=quiz.id;
-    document.getElementById("qrcode").innerHTML="";
+            <table>
 
-    new QRCode(document.getElementById("qrcode"),{
-        text:generatedQuizLink,
-        width:230,
-        height:230,
-        correctLevel:QRCode.CorrectLevel.M
-    });
+                <thead>
 
-    document.getElementById("adminPage").classList.add("hidden");
-    document.getElementById("qrPage").classList.remove("hidden");
-}
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Benar</th>
+                        <th>Nilai</th>
+                    </tr>
 
-function cekLinkQuiz(){
-    const params=new URLSearchParams(window.location.search);
-    const data=params.get("data");
+                </thead>
 
-    if(!data)return;
+                <tbody id="hasilTable">
 
-    try{
-        const decoded=LZString.decompressFromEncodedURIComponent(data);
+                    <tr>
+                        <td colspan="4">
+                            Belum ada peserta.
+                        </td>
+                    </tr>
 
-        if(!decoded)throw new Error("Data kosong");
+                </tbody>
 
-        const loadedQuiz=JSON.parse(decoded);
+            </table>
 
-        if(
-            !loadedQuiz||
-            !loadedQuiz.id||
-            !Array.isArray(loadedQuiz.questions)||
-            loadedQuiz.questions.length===0
-        ){
-            throw new Error("Quiz tidak valid");
-        }
+        </div>
 
-        quiz=loadedQuiz;
+        <button
+            class="danger"
+            onclick="hapusSemuaHasil()">
 
-        document.getElementById("joinQuizTitle").textContent=quiz.title;
-        document.getElementById("joinQuizCode").textContent=quiz.id;
+            🗑️ Hapus Semua Hasil
 
-        document.getElementById("adminPage").classList.add("hidden");
-        document.getElementById("qrPage").classList.add("hidden");
-        document.getElementById("joinPage").classList.remove("hidden");
+        </button>
 
-    }catch(error){
-        alert("Link QR tidak valid atau data quiz rusak.");
-        console.error(error);
-    }
-}
+        <button
+            class="secondary"
+            onclick="kembaliKeQR()">
 
-function mulaiQuiz(){
-    participant=document.getElementById("participantName").value.trim();
+            ⬅️ Kembali ke QR
 
-    if(!participant){
-        alert("Masukkan nama terlebih dahulu.");
-        return;
-    }
+        </button>
 
-    currentQuestion=0;
-    selectedAnswer=null;
-    score=0;
+    </section>
 
-    document.getElementById("joinPage").classList.add("hidden");
-    document.getElementById("quizPage").classList.remove("hidden");
+</div>
 
-    tampilkanSoal();
-}
 
-function tampilkanSoal(){
-    const q=quiz.questions[currentQuestion];
-    selectedAnswer=null;
+<script src="script.js"></script>
 
-    document.getElementById("questionCounter").textContent=
-        "Pertanyaan "+(currentQuestion+1)+" dari "+quiz.questions.length;
-
-    document.getElementById("scoreLive").textContent="Skor: "+score;
-
-    document.getElementById("questionText").textContent=q.question;
-
-    document.getElementById("progressBar").style.width=
-        ((currentQuestion+1)/quiz.questions.length*100)+"%";
-
-    const answers=document.getElementById("answers");
-    answers.innerHTML="";
-
-    ["A","B","C","D"].forEach(huruf=>{
-        const button=document.createElement("button");
-
-        button.className="answer-option";
-        button.textContent=huruf+". "+q[huruf];
-
-        button.onclick=function(){
-            pilihJawaban(huruf,button);
-        };
-
-        answers.appendChild(button);
-    });
-
-    const next=document.getElementById("nextButton");
-    next.disabled=true;
-    next.textContent=
-        currentQuestion===quiz.questions.length-1
-        ?"🏁 Selesai"
-        :"Berikutnya ➡️";
-}
-
-function pilihJawaban(huruf,button){
-    selectedAnswer=huruf;
-
-    document.querySelectorAll(".answer-option")
-        .forEach(btn=>btn.classList.remove("selected"));
-
-    button.classList.add("selected");
-    document.getElementById("nextButton").disabled=false;
-}
-
-function soalBerikutnya(){
-    if(!selectedAnswer){
-        alert("Pilih salah satu jawaban.");
-        return;
-    }
-
-    const q=quiz.questions[currentQuestion];
-
-    if(selectedAnswer===q.correct)score++;
-
-    currentQuestion++;
-
-    if(currentQuestion>=quiz.questions.length){
-        tampilkanHasil();
-    }else{
-        tampilkanSoal();
-    }
-}
-
-function tampilkanHasil(){
-    const total=quiz.questions.length;
-    const nilai=Math.round((score/total)*100);
-
-    document.getElementById("quizPage").classList.add("hidden");
-    document.getElementById("resultPage").classList.remove("hidden");
-
-    document.getElementById("resultName").textContent=participant;
-    document.getElementById("finalScore").textContent=nilai;
-
-    document.getElementById("resultDetail").innerHTML=
-        "Benar: <b>"+score+"</b> dari <b>"+total+
-        "</b> pertanyaan.<br>Nilai: <b>"+nilai+"</b>";
-}
-
-function salinLink(){
-    if(!generatedQuizLink){
-        alert("Generate quiz terlebih dahulu.");
-        return;
-    }
-
-    navigator.clipboard.writeText(generatedQuizLink)
-    .then(()=>alert("Link quiz berhasil disalin!"))
-    .catch(()=>prompt("Salin link berikut:",generatedQuizLink));
-}
-
-function kembaliBuatQuiz(){
-    document.getElementById("qrPage").classList.add("hidden");
-    document.getElementById("adminPage").classList.remove("hidden");
-}
-
-function kembaliKeAwal(){
-    window.location.href=window.location.pathname;
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-    tambahPertanyaan();
-    cekLinkQuiz();
-});
-</script>
 </body>
 </html>
