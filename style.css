@@ -1,39 +1,379 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="struct" />
-		<Option pch_mode="2" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="Debug">
-				<Option output="bin/Debug/struct" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Debug/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-g" />
-				</Compiler>
-			</Target>
-			<Target title="Release">
-				<Option output="bin/Release/struct" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj/Release/" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add option="-O2" />
-				</Compiler>
-				<Linker>
-					<Add option="-s" />
-				</Linker>
-			</Target>
-		</Build>
-		<Compiler>
-			<Add option="-Wall" />
-		</Compiler>
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Extensions />
-	</Project>
-</CodeBlocks_project_file>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    min-height: 100vh;
+    padding: 25px 15px;
+}
+
+.container {
+    width: 100%;
+    max-width: 750px;
+    margin: auto;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+    margin: 10px 0 8px;
+}
+
+.subtitle {
+    color: #eee;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    margin-bottom: 18px;
+}
+
+h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    color: #444;
+    margin: 14px 0 7px;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    padding: 12px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+button {
+    width: 100%;
+    border: 0;
+    border-radius: 9px;
+    padding: 13px;
+    margin-top: 12px;
+    background: #4f46e5;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #3730a3;
+}
+
+button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.secondary {
+    background: #64748b;
+}
+
+.secondary:hover {
+    background: #475569;
+}
+
+.danger {
+    background: #dc2626;
+}
+
+.danger:hover {
+    background: #b91c1c;
+}
+
+.success {
+    background: #16a34a;
+}
+
+.success:hover {
+    background: #15803d;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.info {
+    background: #eef2ff;
+    border-left: 4px solid #4f46e5;
+    padding: 12px;
+    border-radius: 8px;
+    color: #3730a3;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+
+/* ================= SOAL ADMIN ================= */
+
+.question-box {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 15px;
+    background: #fafafa;
+}
+
+.question-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.question-title h3 {
+    color: #333;
+    font-size: 17px;
+}
+
+.question-number {
+    background: #4f46e5;
+    color: white;
+    border-radius: 20px;
+    padding: 6px 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.remove-btn {
+    width: auto;
+    margin: 12px 0 0;
+    padding: 8px 10px;
+    font-size: 12px;
+}
+
+
+/* ================= QR ================= */
+
+.quiz-code {
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: 5px;
+    background: #f1f5f9;
+    padding: 14px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    min-height: 240px;
+}
+
+#qrcode img,
+#qrcode canvas {
+    max-width: 230px;
+    max-height: 230px;
+}
+
+
+/* ================= TEXT ================= */
+
+.small {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.note {
+    margin-top: 12px;
+}
+
+
+/* ================= QUIZ ================= */
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.topbar span {
+    font-weight: bold;
+    color: #475569;
+}
+
+.progress {
+    height: 9px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 10px 0 20px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: #4f46e5;
+    transition: width .2s;
+}
+
+.question-text {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.answer-option {
+    width: 100%;
+    text-align: left;
+    background: #f8fafc;
+    color: #222;
+    border: 2px solid #e2e8f0;
+    margin-top: 10px;
+}
+
+.answer-option:hover {
+    background: #eef2ff;
+    border-color: #4f46e5;
+}
+
+.answer-option.selected {
+    background: #e0e7ff;
+    border-color: #4f46e5;
+}
+
+
+/* ================= HASIL ================= */
+
+.result-score {
+    text-align: center;
+    font-size: 44px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin: 15px 0;
+}
+
+.result-text {
+    text-align: center;
+    font-size: 18px;
+    color: #333;
+    line-height: 1.6;
+}
+
+
+/* ================= DASHBOARD ================= */
+
+.dashboard-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.dashboard-info div {
+    background: #f1f5f9;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    color: #475569;
+    font-size: 14px;
+}
+
+.dashboard-info strong {
+    display: block;
+    font-size: 25px;
+    color: #4f46e5;
+    margin-top: 5px;
+}
+
+
+/* ================= TABLE ================= */
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+th,
+td {
+    border-bottom: 1px solid #ddd;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+th {
+    background: #4f46e5;
+    color: white;
+}
+
+td {
+    color: #333;
+}
+
+tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 500px) {
+
+    body {
+        padding: 15px 10px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .quiz-code {
+        font-size: 25px;
+    }
+
+    .question-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dashboard-info {
+        grid-template-columns: 1fr;
+    }
+
+    .topbar {
+        font-size: 13px;
+    }
+}
