@@ -1,3 +1,6 @@
+/* =========================
+   RESET
+========================= */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -6,232 +9,354 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     min-height: 100vh;
-    padding: 25px 15px;
+    color: #333;
 }
 
+/* =========================
+   CONTAINER
+========================= */
 .container {
     width: 100%;
-    max-width: 750px;
-    margin: auto;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-h1 {
-    color: white;
-    text-align: center;
-    margin: 10px 0 8px;
+/* =========================
+   PAGE
+========================= */
+.page {
+    display: none;
 }
 
-.subtitle {
-    color: #eee;
-    text-align: center;
-    margin-bottom: 20px;
+.page.active {
+    display: block;
 }
 
+/* =========================
+   CARD
+========================= */
 .card {
     background: white;
-    border-radius: 18px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
-    margin-bottom: 18px;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 30px auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 800px;
 }
 
-h2 {
-    color: #333;
+.card h1,
+.card h2,
+.card h3 {
     text-align: center;
     margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    font-weight: bold;
-    color: #444;
-    margin: 14px 0 7px;
+.card h1 {
+    color: #4f46e5;
 }
 
+.card h2 {
+    color: #4f46e5;
+}
+
+/* =========================
+   INPUT
+========================= */
 input,
 textarea,
 select {
     width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 9px;
-    padding: 12px;
+    padding: 13px 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
     font-size: 15px;
-    font-family: inherit;
-}
-
-textarea {
-    min-height: 90px;
-    resize: vertical;
+    margin-top: 7px;
+    outline: none;
+    transition: 0.2s;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-    outline: none;
     border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* =========================
+   LABEL
+========================= */
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    color: #374151;
+}
+
+/* =========================
+   BUTTON
+========================= */
 button {
-    width: 100%;
-    border: 0;
-    border-radius: 9px;
-    padding: 13px;
-    margin-top: 12px;
-    background: #4f46e5;
-    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
     font-size: 15px;
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 button:hover {
-    background: #3730a3;
+    transform: translateY(-2px);
 }
 
-button:disabled {
-    opacity: .55;
-    cursor: not-allowed;
+button:active {
+    transform: scale(0.98);
 }
 
-.secondary {
-    background: #64748b;
+.btn-primary {
+    background: #4f46e5;
+    color: white;
 }
 
-.secondary:hover {
-    background: #475569;
+.btn-primary:hover {
+    background: #4338ca;
 }
 
-.danger {
-    background: #dc2626;
-}
-
-.danger:hover {
-    background: #b91c1c;
-}
-
-.success {
+.btn-success {
     background: #16a34a;
+    color: white;
 }
 
-.success:hover {
+.btn-success:hover {
     background: #15803d;
 }
 
-.hidden {
-    display: none !important;
+.btn-danger {
+    background: #dc2626;
+    color: white;
 }
 
-.info {
-    background: #eef2ff;
-    border-left: 4px solid #4f46e5;
-    padding: 12px;
-    border-radius: 8px;
-    color: #3730a3;
-    font-size: 14px;
-    margin-bottom: 15px;
-    line-height: 1.5;
+.btn-danger:hover {
+    background: #b91c1c;
 }
 
-
-/* ================= SOAL ADMIN ================= */
-
-.question-box {
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    padding: 18px;
-    margin-top: 15px;
-    background: #fafafa;
+.btn-secondary {
+    background: #64748b;
+    color: white;
 }
 
-.question-title {
+.btn-secondary:hover {
+    background: #475569;
+}
+
+/* =========================
+   ADMIN
+========================= */
+.admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
-.question-title h3 {
-    color: #333;
-    font-size: 17px;
+.admin-header h2 {
+    margin: 0;
 }
 
-.question-number {
-    background: #4f46e5;
-    color: white;
-    border-radius: 20px;
-    padding: 6px 10px;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-.remove-btn {
-    width: auto;
-    margin: 12px 0 0;
-    padding: 8px 10px;
-    font-size: 12px;
-}
-
-
-/* ================= QR ================= */
-
-.quiz-code {
-    text-align: center;
-    font-size: 30px;
-    font-weight: bold;
-    letter-spacing: 5px;
-    background: #f1f5f9;
-    padding: 14px;
-    border-radius: 10px;
-    margin: 15px 0;
-}
-
-#qrcode {
+.admin-buttons {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px auto;
-    min-height: 240px;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-#qrcode img,
-#qrcode canvas {
-    max-width: 230px;
-    max-height: 230px;
+/* =========================
+   QUESTION BOX
+========================= */
+.question-box {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
-
-/* ================= TEXT ================= */
-
-.small {
-    font-size: 13px;
-    color: #666;
-    text-align: center;
-    line-height: 1.5;
-}
-
-.note {
-    margin-top: 12px;
-}
-
-
-/* ================= QUIZ ================= */
-
-.topbar {
+.question-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.question-header h3 {
+    margin: 0;
+    color: #4f46e5;
+}
+
+/* =========================
+   QUESTION TIME
+========================= */
+.time-input {
+    margin-top: 5px;
+}
+
+.time-help {
+    display: block;
+    color: #777;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* =========================
+   ANSWER INPUT
+========================= */
+.answer-list {
+    margin-top: 15px;
+}
+
+.answer-item {
+    display: flex;
+    align-items: center;
     gap: 10px;
     margin-bottom: 10px;
 }
 
-.topbar span {
-    font-weight: bold;
-    color: #475569;
+.answer-item input[type="radio"] {
+    width: auto;
+    margin: 0;
 }
 
-.progress {
-    height: 9px;
+.answer-item input[type="text"] {
+    flex: 1;
+    margin: 0;
+}
+
+/* =========================
+   JOIN QUIZ
+========================= */
+.join-box {
+    text-align: center;
+}
+
+.join-box h2 {
+    margin-bottom: 10px;
+}
+
+.join-box p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* =========================
+   CHARACTER
+========================= */
+.character-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.character-option {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    font-size: 32px;
+    background: #f8fafc;
+    border: 3px solid #e2e8f0;
+    border-radius: 15px;
+    transition: 0.2s;
+}
+
+.character-option:hover {
+    background: #eef2ff;
+    transform: scale(1.05);
+}
+
+.character-option.selected {
+    background: #e0e7ff;
+    border-color: #4f46e5;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+/* =========================
+   QUIZ HEADER
+========================= */
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.question-number {
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+.score {
+    font-weight: bold;
+    background: #eef2ff;
+    color: #4f46e5;
+    padding: 8px 14px;
+    border-radius: 20px;
+}
+
+/* =========================
+   TIMER
+========================= */
+.timer-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    background: #fff7ed;
+    border: 2px solid #fed7aa;
+    padding: 12px;
+    border-radius: 12px;
+    margin: 15px 0 8px;
+    color: #c2410c;
+    font-size: 16px;
+}
+
+.timer-box strong {
+    font-size: 25px;
+    min-width: 35px;
+    text-align: center;
+}
+
+.timer-progress {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 100%;
+    background: #f97316;
+    transition: width 1s linear;
+}
+
+/* =========================
+   QUESTION PROGRESS
+========================= */
+.progress-container {
+    width: 100%;
+    height: 10px;
     background: #e5e7eb;
     border-radius: 20px;
     overflow: hidden;
@@ -239,141 +364,364 @@ button:disabled {
 }
 
 .progress-bar {
+    width: 0%;
     height: 100%;
-    width: 0;
     background: #4f46e5;
-    transition: width .2s;
+    transition: width 0.3s ease;
 }
 
+/* =========================
+   QUESTION
+========================= */
 .question-text {
-    text-align: left;
-    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin: 25px 0;
+    line-height: 1.4;
 }
 
-.answer-option {
-    width: 100%;
-    text-align: left;
+/* =========================
+   QUIZ ANSWERS
+========================= */
+.quiz-answers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.answer-button {
     background: #f8fafc;
-    color: #222;
-    border: 2px solid #e2e8f0;
-    margin-top: 10px;
+    border: 3px solid #e2e8f0;
+    color: #333;
+    padding: 18px;
+    border-radius: 15px;
+    font-size: 17px;
+    min-height: 65px;
 }
 
-.answer-option:hover {
+.answer-button:hover {
     background: #eef2ff;
-    border-color: #4f46e5;
+    border-color: #818cf8;
 }
 
-.answer-option.selected {
+.answer-button.selected {
     background: #e0e7ff;
     border-color: #4f46e5;
+    color: #3730a3;
 }
 
+.answer-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
 
-/* ================= HASIL ================= */
+/* =========================
+   NEXT BUTTON
+========================= */
+.next-button-container {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.next-button-container button {
+    min-width: 180px;
+}
+
+/* =========================
+   RESULT
+========================= */
+.result-card {
+    text-align: center;
+}
+
+.result-character {
+    text-align: center;
+    font-size: 70px;
+    margin: 10px 0;
+}
 
 .result-score {
-    text-align: center;
-    font-size: 44px;
+    font-size: 45px;
     font-weight: bold;
     color: #4f46e5;
     margin: 15px 0;
 }
 
-.result-text {
-    text-align: center;
+.result-message {
     font-size: 18px;
-    color: #333;
-    line-height: 1.6;
+    color: #666;
+    margin-bottom: 20px;
 }
 
-
-/* ================= DASHBOARD ================= */
-
-.dashboard-info {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin: 15px 0;
+/* =========================
+   CHARACTER NAME
+========================= */
+.character-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.dashboard-info div {
-    background: #f1f5f9;
-    padding: 15px;
-    border-radius: 10px;
+/* =========================
+   QR CODE
+========================= */
+.qr-container {
     text-align: center;
-    color: #475569;
-    font-size: 14px;
+    margin: 20px 0;
 }
 
-.dashboard-info strong {
-    display: block;
-    font-size: 25px;
-    color: #4f46e5;
-    margin-top: 5px;
+#qrcode {
+    display: inline-block;
+    padding: 15px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-
-/* ================= TABLE ================= */
-
-.table-container {
-    overflow-x: auto;
+/* =========================
+   LINK BOX
+========================= */
+.link-box {
+    display: flex;
+    gap: 10px;
     margin-top: 15px;
 }
 
-table {
+.link-box input {
+    flex: 1;
+    margin: 0;
+}
+
+.link-box button {
+    white-space: nowrap;
+}
+
+/* =========================
+   DASHBOARD
+========================= */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.dashboard-header h2 {
+    margin: 0;
+}
+
+.results-table {
     width: 100%;
     border-collapse: collapse;
-    background: white;
+    margin-top: 20px;
 }
 
-th,
-td {
-    border-bottom: 1px solid #ddd;
-    padding: 12px 8px;
-    text-align: center;
+.results-table th,
+.results-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
 }
 
-th {
-    background: #4f46e5;
-    color: white;
+.results-table th {
+    background: #f8fafc;
+    color: #374151;
 }
 
-td {
-    color: #333;
-}
-
-tr:nth-child(even) {
+.results-table tr:hover {
     background: #f8fafc;
 }
 
+/* =========================
+   RANKING
+========================= */
+.ranking-list {
+    margin-top: 20px;
+}
 
-/* ================= MOBILE ================= */
+.ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
 
-@media (max-width: 500px) {
+.ranking-number {
+    font-size: 22px;
+    font-weight: bold;
+    min-width: 35px;
+    text-align: center;
+}
 
-    body {
-        padding: 15px 10px;
-    }
+.ranking-character {
+    font-size: 35px;
+}
+
+.ranking-name {
+    flex: 1;
+    font-weight: bold;
+}
+
+.ranking-score {
+    font-weight: bold;
+    color: #4f46e5;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: #777;
+}
+
+/* =========================
+   ALERT / MESSAGE
+========================= */
+.message {
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+    font-weight: bold;
+}
+
+.message-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.message-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* =========================
+   HIDDEN
+========================= */
+.hidden {
+    display: none !important;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+    text-align: center;
+    color: white;
+    padding: 20px;
+    font-size: 14px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 700px) {
 
     .card {
-        padding: 18px;
+        padding: 20px;
+        margin: 15px auto;
     }
 
-    .quiz-code {
-        font-size: 25px;
-    }
-
-    .question-title {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .dashboard-info {
+    .quiz-answers {
         grid-template-columns: 1fr;
     }
 
-    .topbar {
+    .admin-header,
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-buttons {
+        flex-direction: column;
+    }
+
+    .admin-buttons button {
+        width: 100%;
+    }
+
+    .question-text {
+        font-size: 20px;
+    }
+
+    .link-box {
+        flex-direction: column;
+    }
+
+    .link-box button {
+        width: 100%;
+    }
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 500px) {
+
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .character-list {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .character-option {
+        font-size: 27px;
+        padding: 9px;
+    }
+
+    .timer-box {
+        font-size: 14px;
+    }
+
+    .timer-box strong {
+        font-size: 22px;
+    }
+
+    .question-text {
+        font-size: 18px;
+    }
+
+    .answer-button {
+        font-size: 15px;
+        padding: 14px;
+    }
+
+    .result-character {
+        font-size: 55px;
+    }
+
+    .result-score {
+        font-size: 35px;
+    }
+
+    .results-table {
         font-size: 13px;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 8px 5px;
     }
 }
