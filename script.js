@@ -3,8 +3,14 @@
 // =====================================================
 
 const firebaseConfig = {
-    // PAKAI CONFIG FIREBASE KAMU YANG LAMA DI SINI
-    // Jangan ubah bagian ini jika konfigurasi kamu sudah benar.
+    apiKey: "AIzaSyDfqwQu1JFNRj7rcMFsBs4Cr_4NnYHK7yo",
+    authDomain: "josua-41db9.firebaseapp.com",
+    databaseURL: "https://josua-41db9-default-rtdb.firebaseio.com",
+    projectId: "josua-41db9",
+    storageBucket: "josua-41db9.firebasestorage.app",
+    messagingSenderId: "648462840825",
+    appId: "1:648462840825:web:0f34c202c99a9bbc40c328",
+    measurementId: "G-S4MNMV7WYK"
 };
 
 
@@ -12,7 +18,9 @@ const firebaseConfig = {
 // INITIALIZE FIREBASE
 // =====================================================
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 const database = firebase.database();
 
@@ -31,21 +39,42 @@ let currentQuestion = 0;
 let selectedAnswer = null;
 let participant = "";
 let score = 0;
-
 let generatedQuizLink = "";
+
 let currentResultListener = null;
 
-// TIMER
 let questionTimer = null;
 let timeLeft = 30;
-
-// KARAKTER
 let selectedCharacter = "🐱";
-
-// Mencegah jawaban diproses dua kali
 let questionProcessed = false;
 
 const MAX_QUESTIONS = 20;
+
+const CHARACTERS = [
+    "🐱",
+    "🐼",
+    "🐸",
+    "🐨",
+    "🦊",
+    "🐰",
+    "🐯",
+    "🐵"
+];
+
+
+// =====================================================
+// HELPER
+// =====================================================
+
+function el(id) {
+    return document.getElementById(id);
+}
+
+function escapeHTML(text) {
+    const div = document.createElement("div");
+    div.textContent = text == null ? "" : text;
+    return div.innerHTML;
+}
 
 
 // =====================================================
@@ -58,24 +87,18 @@ function buatTemplatePertanyaan(nomor) {
         <div class="question-box">
 
             <div class="question-title">
-
-                <h3>
-                    Pertanyaan ${nomor}
-                </h3>
+                <h3>Pertanyaan ${nomor}</h3>
 
                 <span class="question-number">
                     Soal ${nomor}
                 </span>
-
             </div>
-
 
             <label>Pertanyaan</label>
 
             <textarea
                 class="q-text"
-                placeholder="Masukkan pertanyaan...">
-            </textarea>
+                placeholder="Masukkan pertanyaan..."></textarea>
 
 
             <label>Pilihan A</label>
@@ -83,8 +106,7 @@ function buatTemplatePertanyaan(nomor) {
             <input
                 class="q-a"
                 type="text"
-                placeholder="Jawaban A"
-            >
+                placeholder="Jawaban A">
 
 
             <label>Pilihan B</label>
@@ -92,8 +114,7 @@ function buatTemplatePertanyaan(nomor) {
             <input
                 class="q-b"
                 type="text"
-                placeholder="Jawaban B"
-            >
+                placeholder="Jawaban B">
 
 
             <label>Pilihan C</label>
@@ -101,8 +122,7 @@ function buatTemplatePertanyaan(nomor) {
             <input
                 class="q-c"
                 type="text"
-                placeholder="Jawaban C"
-            >
+                placeholder="Jawaban C">
 
 
             <label>Pilihan D</label>
@@ -110,23 +130,20 @@ function buatTemplatePertanyaan(nomor) {
             <input
                 class="q-d"
                 type="text"
-                placeholder="Jawaban D"
-            >
+                placeholder="Jawaban D">
 
 
             <label>Jawaban Benar</label>
 
             <select class="q-correct">
-
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
                 <option value="D">D</option>
-
             </select>
 
 
-            <label>⏱️ Waktu Soal</label>
+            <label>Waktu Pertanyaan</label>
 
             <input
                 class="q-time time-input"
@@ -134,21 +151,17 @@ function buatTemplatePertanyaan(nomor) {
                 min="5"
                 max="300"
                 value="30"
-                placeholder="Contoh: 30"
-            >
+                placeholder="30">
 
-            <span class="time-help">
-                Masukkan waktu dalam detik.
-                Minimal 5 detik, maksimal 300 detik.
-            </span>
+            <small class="time-help">
+                Masukkan waktu 5 sampai 300 detik.
+            </small>
 
 
             <button
                 class="danger remove-btn"
                 onclick="hapusPertanyaan(this)">
-
                 🗑️ Hapus Pertanyaan
-
             </button>
 
         </div>
@@ -162,12 +175,15 @@ function buatTemplatePertanyaan(nomor) {
 
 function tambahPertanyaan() {
 
-    const list =
-        document.getElementById("questionList");
+    const list = el("questionList");
+
+    if (!list) {
+        console.error("Elemen #questionList tidak ditemukan.");
+        return;
+    }
 
     const jumlah =
         list.querySelectorAll(".question-box").length;
-
 
     if (jumlah >= MAX_QUESTIONS) {
 
@@ -175,7 +191,6 @@ function tambahPertanyaan() {
 
         return;
     }
-
 
     list.insertAdjacentHTML(
         "beforeend",
@@ -190,24 +205,33 @@ function tambahPertanyaan() {
 
 function hapusPertanyaan(button) {
 
-    button
-        .closest(".question-box")
-        .remove();
+    if (!button) return;
 
+    const box = button.closest(".question-box");
+
+    if (box) {
+        box.remove();
+    }
 
     document
         .querySelectorAll(".question-box")
         .forEach((box, index) => {
 
-            box.querySelector("h3")
-                .textContent =
-                "Pertanyaan " + (index + 1);
+            const h3 =
+                box.querySelector("h3");
 
+            const number =
+                box.querySelector(".question-number");
 
-            box.querySelector(".question-number")
-                .textContent =
-                "Soal " + (index + 1);
+            if (h3) {
+                h3.textContent =
+                    "Pertanyaan " + (index + 1);
+            }
 
+            if (number) {
+                number.textContent =
+                    "Soal " + (index + 1);
+            }
         });
 }
 
@@ -223,54 +247,48 @@ function ambilPertanyaanDariForm() {
 
     const questions = [];
 
-
     boxes.forEach(box => {
 
-        const waktuInput =
+        const timeInput =
             box.querySelector(".q-time");
 
+        let waktu = 30;
 
-        const waktu =
-            Number(waktuInput?.value) || 30;
+        if (timeInput) {
+            waktu = parseInt(timeInput.value) || 30;
+        }
 
+        if (waktu < 5) {
+            waktu = 5;
+        }
+
+        if (waktu > 300) {
+            waktu = 300;
+        }
 
         questions.push({
 
             question:
-                box.querySelector(".q-text")
-                    .value
-                    .trim(),
+                box.querySelector(".q-text")?.value.trim() || "",
 
             A:
-                box.querySelector(".q-a")
-                    .value
-                    .trim(),
+                box.querySelector(".q-a")?.value.trim() || "",
 
             B:
-                box.querySelector(".q-b")
-                    .value
-                    .trim(),
+                box.querySelector(".q-b")?.value.trim() || "",
 
             C:
-                box.querySelector(".q-c")
-                    .value
-                    .trim(),
+                box.querySelector(".q-c")?.value.trim() || "",
 
             D:
-                box.querySelector(".q-d")
-                    .value
-                    .trim(),
+                box.querySelector(".q-d")?.value.trim() || "",
 
             correct:
-                box.querySelector(".q-correct")
-                    .value,
+                box.querySelector(".q-correct")?.value || "A",
 
             time: waktu
-
         });
-
     });
-
 
     return questions;
 }
@@ -282,18 +300,14 @@ function ambilPertanyaanDariForm() {
 
 async function generateQuiz() {
 
-    const title =
-        document
-            .getElementById("quizTitle")
-            .value
-            .trim() || "Quiz Kelas";
+    const titleInput = el("quizTitle");
 
+    const title =
+        titleInput?.value.trim() || "Quiz Kelas";
 
     const questions =
         ambilPertanyaanDariForm();
 
-
-    // Cek jumlah soal
 
     if (questions.length === 0) {
 
@@ -305,7 +319,17 @@ async function generateQuiz() {
     }
 
 
-    // Cek setiap soal
+    if (questions.length > MAX_QUESTIONS) {
+
+        alert(
+            "Maksimal 20 pertanyaan."
+        );
+
+        return;
+    }
+
+
+    // Cek setiap pertanyaan
 
     for (
         let i = 0;
@@ -314,7 +338,6 @@ async function generateQuiz() {
     ) {
 
         const q = questions[i];
-
 
         if (
             !q.question ||
@@ -334,23 +357,19 @@ async function generateQuiz() {
         }
 
 
-        // Cek waktu
-
         if (
-            !Number.isFinite(q.time) ||
             q.time < 5 ||
             q.time > 300
         ) {
 
             alert(
-                "Waktu soal nomor " +
+                "Waktu pertanyaan nomor " +
                 (i + 1) +
                 " harus antara 5 sampai 300 detik."
             );
 
             return;
         }
-
     }
 
 
@@ -370,13 +389,10 @@ async function generateQuiz() {
         title: title,
 
         questions: questions
-
     };
 
 
     try {
-
-        // Simpan quiz ke Firebase
 
         await database
             .ref("quizzes/" + quizId)
@@ -389,14 +405,11 @@ async function generateQuiz() {
                 questions: questions,
 
                 createdAt:
-                    firebase.database
-                        .ServerValue
-                        .TIMESTAMP
-
+                    firebase.database.ServerValue.TIMESTAMP
             });
 
 
-        // Buat link GitHub Pages
+        // Buat link
 
         const baseUrl =
             window.location.origin +
@@ -411,68 +424,68 @@ async function generateQuiz() {
 
         // Tampilkan kode
 
-        document
-            .getElementById("quizCode")
-            .textContent =
-            quizId;
+        if (el("quizCode")) {
+            el("quizCode").textContent =
+                quizId;
+        }
 
 
-        // Hapus QR lama
+        // QR Code
 
-        document
-            .getElementById("qrcode")
-            .innerHTML = "";
+        if (el("qrcode")) {
 
+            el("qrcode").innerHTML = "";
 
-        // Buat QR baru
+            if (typeof QRCode !== "undefined") {
 
-        new QRCode(
+                new QRCode(
+                    el("qrcode"),
+                    {
+                        text: generatedQuizLink,
+                        width: 230,
+                        height: 230,
+                        correctLevel:
+                            QRCode.CorrectLevel.M
+                    }
+                );
 
-            document.getElementById("qrcode"),
+            } else {
 
-            {
-
-                text: generatedQuizLink,
-
-                width: 230,
-
-                height: 230,
-
-                correctLevel:
-                    QRCode.CorrectLevel.M
-
+                console.warn(
+                    "Library QRCode belum dimuat."
+                );
             }
-
-        );
-
-
-        // Pindah ke QR Page
-
-        document
-            .getElementById("adminPage")
-            .classList.add("hidden");
+        }
 
 
-        document
-            .getElementById("qrPage")
-            .classList.remove("hidden");
+        // Pindah halaman
+
+        if (el("adminPage")) {
+            el("adminPage")
+                .classList.add("hidden");
+        }
+
+        if (el("qrPage")) {
+            el("qrPage")
+                .classList.remove("hidden");
+        }
 
 
         alert(
             "Quiz berhasil dibuat dan disimpan ke Firebase!"
         );
 
-
     } catch (error) {
 
-        console.error(error);
-
+        console.error(
+            "ERROR FIREBASE:",
+            error
+        );
 
         alert(
             "Gagal menyimpan quiz ke Firebase.\n\n" +
             error.message
         );
-
     }
 }
 
@@ -488,20 +501,16 @@ async function cekLinkQuiz() {
             window.location.search
         );
 
-
     const quizId =
         params.get("quiz");
 
 
     if (!quizId) {
-
         return;
     }
 
 
     try {
-
-        // Ambil quiz dari Firebase
 
         const snapshot =
             await database
@@ -514,69 +523,163 @@ async function cekLinkQuiz() {
             throw new Error(
                 "Quiz tidak ditemukan."
             );
-
         }
 
 
         quiz = snapshot.val();
 
 
-        // Pastikan data valid
-
         if (
             !quiz.questions ||
+            !Array.isArray(quiz.questions) ||
             quiz.questions.length === 0
         ) {
 
             throw new Error(
                 "Quiz tidak memiliki pertanyaan."
             );
-
         }
 
 
-        // Tampilkan informasi quiz
+        if (el("joinQuizTitle")) {
 
-        document
-            .getElementById("joinQuizTitle")
-            .textContent =
-            quiz.title;
-
-
-        document
-            .getElementById("joinQuizCode")
-            .textContent =
-            quiz.id;
+            el("joinQuizTitle")
+                .textContent =
+                quiz.title || "Quiz";
+        }
 
 
-        // Tampilkan halaman peserta
+        if (el("joinQuizCode")) {
 
-        document
-            .getElementById("adminPage")
-            .classList.add("hidden");
-
-
-        document
-            .getElementById("qrPage")
-            .classList.add("hidden");
+            el("joinQuizCode")
+                .textContent =
+                quiz.id || quizId;
+        }
 
 
-        document
-            .getElementById("joinPage")
-            .classList.remove("hidden");
+        if (el("adminPage")) {
 
+            el("adminPage")
+                .classList.add("hidden");
+        }
+
+
+        if (el("qrPage")) {
+
+            el("qrPage")
+                .classList.add("hidden");
+        }
+
+
+        if (el("joinPage")) {
+
+            el("joinPage")
+                .classList.remove("hidden");
+        }
+
+
+        buatPilihanKarakter();
 
     } catch (error) {
 
         console.error(error);
 
-
         alert(
             "Quiz tidak ditemukan.\n\n" +
             error.message
         );
-
     }
+}
+
+
+// =====================================================
+// PILIHAN KARAKTER
+// =====================================================
+
+function buatPilihanKarakter() {
+
+    const joinPage = el("joinPage");
+
+    if (!joinPage) return;
+
+
+    // Kalau HTML sudah punya character-list,
+    // gunakan yang sudah ada.
+
+    let list =
+        joinPage.querySelector(".character-list");
+
+
+    // Kalau belum ada, buat otomatis.
+
+    if (!list) {
+
+        const nameInput =
+            el("participantName");
+
+        if (!nameInput) return;
+
+
+        const parent =
+            nameInput.parentElement || joinPage;
+
+
+        list =
+            document.createElement("div");
+
+        list.className =
+            "character-list";
+
+
+        const label =
+            document.createElement("label");
+
+        label.textContent =
+            "Pilih Karakter";
+
+
+        parent.appendChild(label);
+
+        parent.appendChild(list);
+    }
+
+
+    list.innerHTML = "";
+
+
+    CHARACTERS.forEach(character => {
+
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "character-option";
+
+
+        if (character === selectedCharacter) {
+
+            button.classList.add("selected");
+        }
+
+
+        button.textContent =
+            character;
+
+
+        button.dataset.character =
+            character;
+
+
+        button.onclick = function() {
+
+            pilihKarakter(this);
+        };
+
+
+        list.appendChild(button);
+    });
 }
 
 
@@ -586,29 +689,21 @@ async function cekLinkQuiz() {
 
 function pilihKarakter(button) {
 
-    if (!button) {
-        return;
-    }
+    if (!button) return;
 
-
-    // Ambil karakter dari data-character
 
     selectedCharacter =
-        button.dataset.character || "🐱";
+        button.dataset.character ||
+        button.textContent;
 
-
-    // Hilangkan selected dari semua tombol
 
     document
         .querySelectorAll(".character-option")
-        .forEach(btn => {
+        .forEach(item => {
 
-            btn.classList.remove("selected");
-
+            item.classList.remove("selected");
         });
 
-
-    // Tandai karakter yang dipilih
 
     button.classList.add("selected");
 }
@@ -620,11 +715,12 @@ function pilihKarakter(button) {
 
 function mulaiQuiz() {
 
+    const nameInput =
+        el("participantName");
+
+
     participant =
-        document
-            .getElementById("participantName")
-            .value
-            .trim();
+        nameInput?.value.trim() || "";
 
 
     if (!participant) {
@@ -647,22 +743,7 @@ function mulaiQuiz() {
     }
 
 
-    // Pastikan karakter tetap yang dipilih peserta
-
-    const karakterTerpilih =
-        document.querySelector(
-            ".character-option.selected"
-        );
-
-
-    if (karakterTerpilih) {
-
-        selectedCharacter =
-            karakterTerpilih.dataset.character ||
-            "🐱";
-
-    }
-
+    // Jangan reset karakter di sini.
 
     currentQuestion = 0;
 
@@ -673,22 +754,167 @@ function mulaiQuiz() {
     questionProcessed = false;
 
 
-    // Hapus timer lama
+    if (el("joinPage")) {
 
-    clearInterval(questionTimer);
-
-
-    document
-        .getElementById("joinPage")
-        .classList.add("hidden");
+        el("joinPage")
+            .classList.add("hidden");
+    }
 
 
-    document
-        .getElementById("quizPage")
-        .classList.remove("hidden");
+    if (el("quizPage")) {
+
+        el("quizPage")
+            .classList.remove("hidden");
+    }
 
 
     tampilkanSoal();
+}
+
+
+// =====================================================
+// TIMER
+// =====================================================
+
+function hentikanTimer() {
+
+    if (questionTimer) {
+
+        clearInterval(questionTimer);
+
+        questionTimer = null;
+    }
+}
+
+
+function mulaiTimer() {
+
+    hentikanTimer();
+
+
+    const q =
+        quiz.questions[currentQuestion];
+
+
+    let waktu =
+        parseInt(q.time);
+
+
+    if (
+        isNaN(waktu) ||
+        waktu < 5
+    ) {
+
+        waktu = 30;
+    }
+
+
+    if (waktu > 300) {
+
+        waktu = 300;
+    }
+
+
+    timeLeft = waktu;
+
+    updateTimerDisplay();
+
+
+    questionTimer =
+        setInterval(() => {
+
+            timeLeft--;
+
+            updateTimerDisplay();
+
+
+            if (timeLeft <= 0) {
+
+                hentikanTimer();
+
+                waktuHabis();
+            }
+
+        }, 1000);
+}
+
+
+function updateTimerDisplay() {
+
+    const timer =
+        el("questionTimer");
+
+
+    const timerBar =
+        el("timerBar");
+
+
+    const q =
+        quiz.questions[currentQuestion];
+
+
+    let totalTime =
+        parseInt(q?.time) || 30;
+
+
+    if (timer) {
+
+        timer.textContent =
+            timeLeft;
+    }
+
+
+    if (timerBar) {
+
+        const percentage =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    (timeLeft / totalTime) * 100
+                )
+            );
+
+
+        timerBar.style.width =
+            percentage + "%";
+    }
+}
+
+
+// =====================================================
+// WAKTU HABIS
+// =====================================================
+
+function waktuHabis() {
+
+    if (questionProcessed) {
+        return;
+    }
+
+
+    questionProcessed = true;
+
+    selectedAnswer = null;
+
+
+    const buttons =
+        document.querySelectorAll(
+            ".answer-option, .answer-button"
+        );
+
+
+    buttons.forEach(button => {
+
+        button.disabled = true;
+    });
+
+
+    setTimeout(() => {
+
+        prosesJawaban();
+
+    }, 300);
 }
 
 
@@ -698,13 +924,19 @@ function mulaiQuiz() {
 
 function tampilkanSoal() {
 
-    // Hentikan timer sebelumnya
-
-    clearInterval(questionTimer);
+    hentikanTimer();
 
 
     const q =
         quiz.questions[currentQuestion];
+
+
+    if (!q) {
+
+        tampilkanHasil();
+
+        return;
+    }
 
 
     selectedAnswer = null;
@@ -714,47 +946,65 @@ function tampilkanSoal() {
 
     // Counter
 
-    document
-        .getElementById("questionCounter")
-        .textContent =
-        "Pertanyaan " +
-        (currentQuestion + 1) +
-        " dari " +
-        quiz.questions.length;
+    if (el("questionCounter")) {
+
+        el("questionCounter")
+            .textContent =
+            "Pertanyaan " +
+            (currentQuestion + 1) +
+            " dari " +
+            quiz.questions.length;
+    }
 
 
     // Score
 
-    document
-        .getElementById("scoreLive")
-        .textContent =
-        "Skor: " + score;
+    if (el("scoreLive")) {
+
+        el("scoreLive")
+            .textContent =
+            "Skor: " + score;
+    }
 
 
     // Pertanyaan
 
-    document
-        .getElementById("questionText")
-        .textContent =
-        q.question;
+    if (el("questionText")) {
+
+        el("questionText")
+            .textContent =
+            q.question;
+    }
 
 
-    // Progress soal
+    // Progress
 
-    document
-        .getElementById("progressBar")
-        .style.width =
-        (
-            (currentQuestion + 1) /
-            quiz.questions.length *
-            100
-        ) + "%";
+    if (el("progressBar")) {
+
+        el("progressBar")
+            .style.width =
+            (
+                (currentQuestion + 1) /
+                quiz.questions.length *
+                100
+            ) + "%";
+    }
 
 
     // Jawaban
 
     const answers =
-        document.getElementById("answers");
+        el("answers");
+
+
+    if (!answers) {
+
+        console.error(
+            "Elemen #answers tidak ditemukan."
+        );
+
+        return;
+    }
 
 
     answers.innerHTML = "";
@@ -765,6 +1015,9 @@ function tampilkanSoal() {
 
             const button =
                 document.createElement("button");
+
+
+            button.type = "button";
 
 
             button.className =
@@ -784,179 +1037,43 @@ function tampilkanSoal() {
                         huruf,
                         button
                     );
-
                 };
 
 
             answers.appendChild(button);
-
         });
 
 
     // Tombol berikutnya
 
     const next =
-        document.getElementById("nextButton");
+        el("nextButton");
 
 
-    next.disabled = true;
+    if (next) {
+
+        next.disabled = true;
 
 
-    if (
-        currentQuestion ===
-        quiz.questions.length - 1
-    ) {
+        if (
+            currentQuestion ===
+            quiz.questions.length - 1
+        ) {
 
-        next.textContent =
-            "🏁 Selesai";
+            next.textContent =
+                "🏁 Selesai";
 
-    } else {
+        } else {
 
-        next.textContent =
-            "Berikutnya ➡️";
-
+            next.textContent =
+                "Berikutnya ➡️";
+        }
     }
 
 
-    // MULAI TIMER
+    // Timer
 
-    mulaiTimer(
-        Number(q.time) || 30
-    );
-}
-
-
-// =====================================================
-// TIMER
-// =====================================================
-
-function mulaiTimer(seconds) {
-
-    clearInterval(questionTimer);
-
-
-    timeLeft = seconds;
-
-
-    const timerText =
-        document.getElementById("questionTimer");
-
-
-    const timerBar =
-        document.getElementById("timerBar");
-
-
-    if (timerText) {
-
-        timerText.textContent =
-            timeLeft;
-
-    }
-
-
-    if (timerBar) {
-
-        timerBar.style.width =
-            "100%";
-
-    }
-
-
-    questionTimer =
-        setInterval(() => {
-
-            timeLeft--;
-
-
-            if (timerText) {
-
-                timerText.textContent =
-                    timeLeft;
-
-            }
-
-
-            if (timerBar) {
-
-                const persen =
-                    Math.max(
-                        0,
-                        (timeLeft / seconds) * 100
-                    );
-
-
-                timerBar.style.width =
-                    persen + "%";
-
-            }
-
-
-            // Waktu habis
-
-            if (timeLeft <= 0) {
-
-                clearInterval(questionTimer);
-
-                waktuHabis();
-
-            }
-
-        }, 1000);
-}
-
-
-// =====================================================
-// WAKTU HABIS
-// =====================================================
-
-function waktuHabis() {
-
-    if (questionProcessed) {
-        return;
-    }
-
-
-    const timerText =
-        document.getElementById("questionTimer");
-
-
-    if (timerText) {
-
-        timerText.textContent =
-            "0";
-
-    }
-
-
-    // Disable semua jawaban
-
-    document
-        .querySelectorAll(".answer-option")
-        .forEach(button => {
-
-            button.disabled = true;
-
-        });
-
-
-    // Jika belum menjawab,
-    // dianggap salah
-
-    if (!selectedAnswer) {
-
-        selectedAnswer = null;
-
-    }
-
-
-    // Beri waktu sedikit agar peserta
-    // melihat waktu habis
-
-    setTimeout(() => {
-
-        prosesJawaban(true);
-
-    }, 700);
+    mulaiTimer();
 }
 
 
@@ -969,9 +1086,6 @@ function pilihJawaban(
     button
 ) {
 
-    // Kalau soal sudah diproses
-    // jangan bisa memilih lagi
-
     if (questionProcessed) {
         return;
     }
@@ -981,24 +1095,80 @@ function pilihJawaban(
 
 
     document
-        .querySelectorAll(".answer-option")
+        .querySelectorAll(
+            ".answer-option, .answer-button"
+        )
         .forEach(btn => {
 
             btn.classList.remove(
                 "selected"
             );
-
         });
 
 
-    button.classList.add(
-        "selected"
-    );
+    if (button) {
+
+        button.classList.add(
+            "selected"
+        );
+    }
 
 
-    document
-        .getElementById("nextButton")
-        .disabled = false;
+    const next =
+        el("nextButton");
+
+
+    if (next) {
+
+        next.disabled = false;
+    }
+}
+
+
+// =====================================================
+// PROSES JAWABAN
+// =====================================================
+
+function prosesJawaban() {
+
+    if (questionProcessed === false) {
+
+        questionProcessed = true;
+    }
+
+
+    hentikanTimer();
+
+
+    const q =
+        quiz.questions[currentQuestion];
+
+
+    // Jawaban benar
+
+    if (
+        selectedAnswer &&
+        selectedAnswer === q.correct
+    ) {
+
+        score++;
+    }
+
+
+    currentQuestion++;
+
+
+    if (
+        currentQuestion >=
+        quiz.questions.length
+    ) {
+
+        tampilkanHasil();
+
+    } else {
+
+        tampilkanSoal();
+    }
 }
 
 
@@ -1013,9 +1183,6 @@ function soalBerikutnya() {
     }
 
 
-    // Kalau belum menjawab,
-    // jangan lanjut kecuali timer habis
-
     if (!selectedAnswer) {
 
         alert(
@@ -1026,87 +1193,7 @@ function soalBerikutnya() {
     }
 
 
-    prosesJawaban(false);
-}
-
-
-// =====================================================
-// PROSES JAWABAN
-// =====================================================
-
-function prosesJawaban(waktuHabisFlag = false) {
-
-    if (questionProcessed) {
-        return;
-    }
-
-
-    questionProcessed = true;
-
-
-    // Hentikan timer
-
-    clearInterval(questionTimer);
-
-
-    const q =
-        quiz.questions[currentQuestion];
-
-
-    // Cek jawaban
-
-    if (
-        selectedAnswer &&
-        selectedAnswer === q.correct
-    ) {
-
-        score++;
-
-    }
-
-
-    // Disable tombol jawaban
-
-    document
-        .querySelectorAll(".answer-option")
-        .forEach(button => {
-
-            button.disabled = true;
-
-        });
-
-
-    // Update score
-
-    document
-        .getElementById("scoreLive")
-        .textContent =
-        "Skor: " + score;
-
-
-    // Tunggu sebentar lalu lanjut
-
-    setTimeout(() => {
-
-        currentQuestion++;
-
-
-        // Kalau sudah selesai
-
-        if (
-            currentQuestion >=
-            quiz.questions.length
-        ) {
-
-            tampilkanHasil();
-
-        } else {
-
-            tampilkanSoal();
-
-        }
-
-    }, waktuHabisFlag ? 300 : 200);
+    prosesJawaban();
 }
 
 
@@ -1116,9 +1203,7 @@ function prosesJawaban(waktuHabisFlag = false) {
 
 async function tampilkanHasil() {
 
-    // Hentikan timer
-
-    clearInterval(questionTimer);
+    hentikanTimer();
 
 
     const total =
@@ -1126,73 +1211,77 @@ async function tampilkanHasil() {
 
 
     const nilai =
-        Math.round(
-            (score / total) * 100
-        );
+        total > 0
+            ? Math.round(
+                (score / total) * 100
+            )
+            : 0;
 
 
-    // Tampilkan halaman hasil
+    // Pindah halaman
 
-    document
-        .getElementById("quizPage")
-        .classList.add("hidden");
+    if (el("quizPage")) {
+
+        el("quizPage")
+            .classList.add("hidden");
+    }
 
 
-    document
-        .getElementById("resultPage")
-        .classList.remove("hidden");
+    if (el("resultPage")) {
+
+        el("resultPage")
+            .classList.remove("hidden");
+    }
 
 
     // Nama
 
-    document
-        .getElementById("resultName")
-        .textContent =
-        participant;
+    if (el("resultName")) {
+
+        el("resultName")
+            .textContent =
+            participant;
+    }
 
 
     // Karakter
 
-    const resultCharacter =
-        document.getElementById(
-            "resultCharacter"
-        );
+    if (el("resultCharacter")) {
 
-
-    if (resultCharacter) {
-
-        resultCharacter.textContent =
+        el("resultCharacter")
+            .textContent =
             selectedCharacter;
-
     }
 
 
     // Nilai
 
-    document
-        .getElementById("finalScore")
-        .textContent =
-        nilai;
+    if (el("finalScore")) {
+
+        el("finalScore")
+            .textContent =
+            nilai;
+    }
 
 
-    // Detail hasil
+    // Detail
 
-    document
-        .getElementById("resultDetail")
-        .innerHTML =
+    if (el("resultDetail")) {
 
-        "Benar: <b>" +
-        score +
-        "</b> dari <b>" +
-        total +
-        "</b> pertanyaan." +
+        el("resultDetail")
+            .innerHTML =
+            "Benar: <b>" +
+            score +
+            "</b> dari <b>" +
+            total +
+            "</b> pertanyaan." +
+            "<br>Nilai: <b>" +
+            nilai +
+            "</b>";
+    }
 
-        "<br>Nilai: <b>" +
-        nilai +
-        "</b>";
 
-
-    // Simpan hasil ke Firebase
+    // Simpan ke Firebase
 
     try {
 
@@ -1215,10 +1304,7 @@ async function tampilkanHasil() {
                 score: nilai,
 
                 submittedAt:
-                    firebase.database
-                        .ServerValue
-                        .TIMESTAMP
-
+                    firebase.database.ServerValue.TIMESTAMP
             });
 
 
@@ -1226,17 +1312,14 @@ async function tampilkanHasil() {
             "Nilai berhasil dikirim ke Firebase."
         );
 
-
     } catch (error) {
 
         console.error(error);
-
 
         alert(
             "Nilai gagal dikirim ke Firebase.\n\n" +
             error.message
         );
-
     }
 }
 
@@ -1257,25 +1340,35 @@ function salinLink() {
     }
 
 
-    navigator.clipboard
-        .writeText(generatedQuizLink)
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
 
-        .then(() => {
+        navigator.clipboard
+            .writeText(generatedQuizLink)
+            .then(() => {
 
-            alert(
-                "Link quiz berhasil disalin!"
-            );
+                alert(
+                    "Link quiz berhasil disalin!"
+                );
 
-        })
+            })
+            .catch(() => {
 
-        .catch(() => {
+                prompt(
+                    "Salin link berikut:",
+                    generatedQuizLink
+                );
+            });
 
-            prompt(
-                "Salin link berikut:",
-                generatedQuizLink
-            );
+    } else {
 
-        });
+        prompt(
+            "Salin link berikut:",
+            generatedQuizLink
+        );
+    }
 }
 
 
@@ -1285,26 +1378,34 @@ function salinLink() {
 
 function bukaDashboard() {
 
-    document
-        .getElementById("qrPage")
-        .classList.add("hidden");
+    if (el("qrPage")) {
+
+        el("qrPage")
+            .classList.add("hidden");
+    }
 
 
-    document
-        .getElementById("dashboardPage")
-        .classList.remove("hidden");
+    if (el("dashboardPage")) {
+
+        el("dashboardPage")
+            .classList.remove("hidden");
+    }
 
 
-    document
-        .getElementById("dashboardTitle")
-        .textContent =
-        quiz.title;
+    if (el("dashboardTitle")) {
+
+        el("dashboardTitle")
+            .textContent =
+            quiz.title;
+    }
 
 
-    document
-        .getElementById("dashboardCode")
-        .textContent =
-        quiz.id;
+    if (el("dashboardCode")) {
+
+        el("dashboardCode")
+            .textContent =
+            quiz.id;
+    }
 
 
     dengarkanHasil();
@@ -1333,6 +1434,7 @@ function dengarkanHasil() {
             currentResultListener
         );
 
+        currentResultListener = null;
     }
 
 
@@ -1345,7 +1447,7 @@ function dengarkanHasil() {
             snapshot.forEach(child => {
 
                 const data =
-                    child.val();
+                    child.val() || {};
 
 
                 results.push({
@@ -1376,15 +1478,12 @@ function dengarkanHasil() {
                         ),
 
                     submittedAt:
-                        data.submittedAt ||
-                        0
-
+                        data.submittedAt || 0
                 });
-
             });
 
 
-            // Urutkan nilai tertinggi
+            // Nilai tertinggi
 
             results.sort(
                 (a, b) => {
@@ -1398,7 +1497,6 @@ function dengarkanHasil() {
                             b.score -
                             a.score
                         );
-
                     }
 
 
@@ -1406,13 +1504,11 @@ function dengarkanHasil() {
                         b.correct -
                         a.correct
                     );
-
                 }
             );
 
 
             tampilkanRanking(results);
-
         };
 
 
@@ -1430,9 +1526,17 @@ function dengarkanHasil() {
 function tampilkanRanking(results) {
 
     const table =
-        document.getElementById(
-            "hasilTable"
+        el("hasilTable");
+
+
+    if (!table) {
+
+        console.error(
+            "Elemen #hasilTable tidak ditemukan."
         );
+
+        return;
+    }
 
 
     table.innerHTML = "";
@@ -1441,30 +1545,26 @@ function tampilkanRanking(results) {
     if (results.length === 0) {
 
         table.innerHTML = `
-
             <tr>
-
-                <td colspan="4">
-
+                <td colspan="5">
                     Belum ada peserta.
-
                 </td>
-
             </tr>
-
         `;
 
 
-        document
-            .getElementById("jumlahPeserta")
-            .textContent =
-            "0";
+        if (el("jumlahPeserta")) {
+
+            el("jumlahPeserta")
+                .textContent = "0";
+        }
 
 
-        document
-            .getElementById("nilaiTertinggi")
-            .textContent =
-            "0";
+        if (el("nilaiTertinggi")) {
+
+            el("nilaiTertinggi")
+                .textContent = "0";
+        }
 
 
         return;
@@ -1475,88 +1575,59 @@ function tampilkanRanking(results) {
         (result, index) => {
 
             const row =
-                document.createElement(
-                    "tr"
-                );
+                document.createElement("tr");
 
 
             row.innerHTML = `
-
                 <td>
                     ${index + 1}
                 </td>
 
-
                 <td>
-
-                    <b>
-                        ${result.character}
-                        ${escapeHTML(
-                            result.name
-                        )}
-                    </b>
-
+                    <span style="font-size:25px;">
+                        ${escapeHTML(result.character)}
+                    </span>
                 </td>
 
+                <td>
+                    <b>
+                        ${escapeHTML(result.name)}
+                    </b>
+                </td>
 
                 <td>
-
                     ${result.correct}
                     /
                     ${result.total}
-
                 </td>
 
-
                 <td>
-
                     <b>
                         ${result.score}
                     </b>
-
                 </td>
-
             `;
 
 
             table.appendChild(row);
-
         }
     );
 
 
-    // Jumlah peserta
+    if (el("jumlahPeserta")) {
 
-    document
-        .getElementById("jumlahPeserta")
-        .textContent =
-        results.length;
-
-
-    // Nilai tertinggi
-
-    document
-        .getElementById("nilaiTertinggi")
-        .textContent =
-        results[0].score;
-}
+        el("jumlahPeserta")
+            .textContent =
+            results.length;
+    }
 
 
-// =====================================================
-// ESCAPE HTML
-// =====================================================
+    if (el("nilaiTertinggi")) {
 
-function escapeHTML(text) {
-
-    const div =
-        document.createElement("div");
-
-
-    div.textContent =
-        text;
-
-
-    return div.innerHTML;
+        el("nilaiTertinggi")
+            .textContent =
+            results[0].score;
+    }
 }
 
 
@@ -1573,7 +1644,6 @@ function hapusSemuaHasil() {
 
 
     if (!yakin) {
-
         return;
     }
 
@@ -1597,12 +1667,10 @@ function hapusSemuaHasil() {
 
             console.error(error);
 
-
             alert(
                 "Gagal menghapus hasil:\n" +
                 error.message
             );
-
         });
 }
 
@@ -1613,14 +1681,18 @@ function hapusSemuaHasil() {
 
 function kembaliKeQR() {
 
-    document
-        .getElementById("dashboardPage")
-        .classList.add("hidden");
+    if (el("dashboardPage")) {
+
+        el("dashboardPage")
+            .classList.add("hidden");
+    }
 
 
-    document
-        .getElementById("qrPage")
-        .classList.remove("hidden");
+    if (el("qrPage")) {
+
+        el("qrPage")
+            .classList.remove("hidden");
+    }
 }
 
 
@@ -1629,9 +1701,6 @@ function kembaliKeQR() {
 // =====================================================
 
 function kembaliBuatQuiz() {
-
-    clearInterval(questionTimer);
-
 
     window.location.href =
         window.location.pathname;
@@ -1643,9 +1712,6 @@ function kembaliBuatQuiz() {
 // =====================================================
 
 function kembaliKeAwal() {
-
-    clearInterval(questionTimer);
-
 
     window.location.href =
         window.location.pathname;
@@ -1660,13 +1726,10 @@ document.addEventListener(
     "DOMContentLoaded",
     function() {
 
-        /*
-         * Kalau halaman dibuka tanpa ?quiz=
-         * maka tampil sebagai halaman admin.
-         *
-         * Kalau dibuka dengan ?quiz=ABC123
-         * maka mengambil quiz dari Firebase.
-         */
+        console.log(
+            "Quiz website berhasil menjalankan JavaScript."
+        );
+
 
         const params =
             new URLSearchParams(
@@ -1680,15 +1743,27 @@ document.addEventListener(
 
         if (quizId) {
 
+            // Peserta
+
             cekLinkQuiz();
 
         } else {
 
-            // Admin mulai dengan 1 pertanyaan
+            // Admin
 
-            tambahPertanyaan();
+            const list =
+                el("questionList");
 
+
+            if (
+                list &&
+                list.querySelectorAll(
+                    ".question-box"
+                ).length === 0
+            ) {
+
+                tambahPertanyaan();
+            }
         }
-
     }
 );
