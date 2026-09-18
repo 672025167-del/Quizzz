@@ -1,110 +1,195 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Quiz Kelas - QR Code</title>
 
+
     <!-- Firebase -->
+
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
+
     <!-- QR Code -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+
     <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
+
     <h1>🎓 Quiz Kelas</h1>
-    <p class="subtitle">Quiz pilihan ganda dengan QR Code</p>
+
+    <p class="subtitle">
+        Quiz pilihan ganda dengan QR Code
+    </p>
+
 
 
     <!-- ================= ADMIN ================= -->
 
-    <section id="adminPage" class="card">
+    <section
+        id="adminPage"
+        class="card">
 
         <h2>📝 Buat Quiz</h2>
 
+
         <div class="info">
+
             <b>Cara kerja:</b><br>
+
             1. Buat pertanyaan di bawah.<br>
-            2. Klik Generate Quiz.<br>
-            3. Bagikan QR Code kepada mahasiswa.<br>
-            4. Mahasiswa scan QR dan langsung masuk ke quiz.<br>
-            5. Nilai mahasiswa otomatis masuk ke Firebase.
+
+            2. Atur waktu setiap soal.<br>
+
+            3. Klik Generate Quiz.<br>
+
+            4. Bagikan QR Code kepada mahasiswa.<br>
+
+            5. Mahasiswa scan QR dan langsung masuk ke quiz.<br>
+
+            6. Nilai mahasiswa otomatis masuk ke Firebase.
+
         </div>
 
-        <label>Judul Quiz</label>
+
+        <label>
+            Judul Quiz
+        </label>
+
+
         <input
             id="quizTitle"
             type="text"
             placeholder="Contoh: Quiz Jaringan Komputer"
         >
 
+
         <div id="questionList"></div>
 
-        <button onclick="tambahPertanyaan()">
+
+        <button
+            onclick="tambahPertanyaan()">
+
             ➕ Tambah Pertanyaan
+
         </button>
 
-        <button class="success" onclick="generateQuiz()">
+
+        <button
+            class="success"
+            onclick="generateQuiz()">
+
             🚀 Generate Quiz & QR Code
+
         </button>
 
     </section>
 
 
+
     <!-- ================= QR PAGE ================= -->
 
-    <section id="qrPage" class="card hidden">
+    <section
+        id="qrPage"
+        class="card hidden">
 
-        <h2>🎉 Quiz Siap</h2>
+        <h2>
+            🎉 Quiz Siap
+        </h2>
+
 
         <p class="small">
             Kode Quiz:
         </p>
 
-        <div class="quiz-code" id="quizCode">
+
+        <div
+            class="quiz-code"
+            id="quizCode">
+
             ------
+
         </div>
+
 
         <p class="small">
             Scan QR Code menggunakan HP mahasiswa.
         </p>
 
+
         <div id="qrcode"></div>
 
-        <button onclick="salinLink()">
+
+        <button
+            onclick="salinLink()">
+
             📋 Salin Link Quiz
+
         </button>
 
-        <button class="success" onclick="bukaDashboard()">
+
+        <button
+            class="success"
+            onclick="bukaDashboard()">
+
             📊 Lihat Nilai & Ranking
+
         </button>
 
-        <button class="secondary" onclick="kembaliBuatQuiz()">
+
+        <button
+            class="secondary"
+            onclick="kembaliBuatQuiz()">
+
             ✏️ Buat Quiz Lagi
+
         </button>
+
 
         <p class="small note">
+
             QR Code berisi alamat GitHub Pages quiz.
             Mahasiswa tidak perlu mengetik kode secara manual.
+
         </p>
 
     </section>
 
 
+
     <!-- ================= JOIN PAGE ================= -->
 
-    <section id="joinPage" class="card hidden">
+    <section
+        id="joinPage"
+        class="card hidden">
 
-        <h2>👋 Ikuti Quiz</h2>
+        <h2>
+            👋 Ikuti Quiz
+        </h2>
+
 
         <div class="info">
 
@@ -112,16 +197,24 @@
                 Quiz Kelas
             </b>
 
+
             <br>
 
+
             Kode:
+
             <span id="joinQuizCode">
                 ------
             </span>
 
         </div>
 
-        <label>Nama Peserta</label>
+
+
+        <label>
+            👤 Nama Peserta
+        </label>
+
 
         <input
             id="participantName"
@@ -130,45 +223,218 @@
             maxlength="50"
         >
 
-        <button onclick="mulaiQuiz()">
+
+
+        <!-- ================= PILIH KARAKTER ================= -->
+
+        <label>
+            🎨 Pilih Karakter Kamu
+        </label>
+
+
+        <p class="small">
+            Pilih karakter yang ingin kamu gunakan 😆
+        </p>
+
+
+        <div class="character-list">
+
+
+            <button
+                type="button"
+                class="character-option selected"
+                data-character="🐱"
+                onclick="pilihKarakter(this)">
+
+                🐱
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐼"
+                onclick="pilihKarakter(this)">
+
+                🐼
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐸"
+                onclick="pilihKarakter(this)">
+
+                🐸
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐨"
+                onclick="pilihKarakter(this)">
+
+                🐨
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🦊"
+                onclick="pilihKarakter(this)">
+
+                🦊
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐰"
+                onclick="pilihKarakter(this)">
+
+                🐰
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐯"
+                onclick="pilihKarakter(this)">
+
+                🐯
+
+            </button>
+
+
+            <button
+                type="button"
+                class="character-option"
+                data-character="🐵"
+                onclick="pilihKarakter(this)">
+
+                🐵
+
+            </button>
+
+
+        </div>
+
+
+
+        <button
+            onclick="mulaiQuiz()">
+
             ▶️ Mulai Quiz
+
         </button>
 
     </section>
 
 
+
     <!-- ================= QUIZ PAGE ================= -->
 
-    <section id="quizPage" class="card hidden">
+    <section
+        id="quizPage"
+        class="card hidden">
+
 
         <div class="topbar">
 
+
             <span id="questionCounter">
+
                 Pertanyaan 1 dari 1
+
             </span>
 
+
             <span id="scoreLive">
+
                 Skor: 0
+
+            </span>
+
+
+        </div>
+
+
+
+        <!-- ================= TIMER ================= -->
+
+
+        <div class="timer-box">
+
+            <span>
+                ⏱️ Waktu:
+            </span>
+
+
+            <strong id="questionTimer">
+
+                30
+
+            </strong>
+
+
+            <span>
+                detik
             </span>
 
         </div>
+
+
+
+        <div class="timer-progress">
+
+            <div
+                id="timerBar"
+                class="timer-bar">
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= PROGRESS ================= -->
 
         <div class="progress">
 
             <div
                 id="progressBar"
                 class="progress-bar">
+
             </div>
 
         </div>
 
+
+
         <h2
             id="questionText"
             class="question-text">
+
             Pertanyaan
+
         </h2>
 
+
+
         <div id="answers"></div>
+
+
 
         <button
             id="nextButton"
@@ -179,14 +445,33 @@
 
         </button>
 
+
     </section>
+
 
 
     <!-- ================= RESULT PAGE ================= -->
 
-    <section id="resultPage" class="card hidden">
+    <section
+        id="resultPage"
+        class="card hidden">
 
-        <h2>🏆 Hasil Quiz</h2>
+
+        <h2>
+            🏆 Hasil Quiz
+        </h2>
+
+
+
+        <div
+            id="resultCharacter"
+            class="result-character">
+
+            🐱
+
+        </div>
+
+
 
         <p class="result-text">
 
@@ -198,6 +483,8 @@
 
         </p>
 
+
+
         <div
             class="result-score"
             id="finalScore">
@@ -206,81 +493,147 @@
 
         </div>
 
+
+
         <p
             class="result-text"
             id="resultDetail">
+
         </p>
 
-        <button onclick="kembaliKeAwal()">
+
+
+        <button
+            onclick="kembaliKeAwal()">
+
             🔄 Kembali
+
         </button>
+
 
     </section>
 
 
+
     <!-- ================= DASHBOARD ================= -->
 
-    <section id="dashboardPage" class="card hidden">
+    <section
+        id="dashboardPage"
+        class="card hidden">
 
-        <h2>📊 Dashboard Nilai</h2>
+
+        <h2>
+            📊 Dashboard Nilai
+        </h2>
+
+
 
         <div class="info">
+
 
             <b id="dashboardTitle">
                 Quiz Kelas
             </b>
 
+
             <br>
 
+
             Kode:
+
             <span id="dashboardCode">
                 ------
             </span>
 
+
         </div>
+
+
 
         <div class="dashboard-info">
 
-            <div>
-                👥 Peserta
-                <strong id="jumlahPeserta">0</strong>
-            </div>
 
             <div>
-                🏆 Nilai Tertinggi
-                <strong id="nilaiTertinggi">0</strong>
+
+                👥 Peserta
+
+                <strong id="jumlahPeserta">
+                    0
+                </strong>
+
             </div>
+
+
+            <div>
+
+                🏆 Nilai Tertinggi
+
+                <strong id="nilaiTertinggi">
+                    0
+                </strong>
+
+            </div>
+
 
         </div>
 
+
+
         <div class="table-container">
 
+
             <table>
+
 
                 <thead>
 
                     <tr>
-                        <th>No</th>
-                        <th>Nama</th>
-                        <th>Benar</th>
-                        <th>Nilai</th>
+
+                        <th>
+                            No
+                        </th>
+
+                        <th>
+                            Nama
+                        </th>
+
+                        <th>
+                            Benar
+                        </th>
+
+                        <th>
+                            Nilai
+                        </th>
+
                     </tr>
 
                 </thead>
 
+
+
                 <tbody id="hasilTable">
 
+
                     <tr>
+
                         <td colspan="4">
+
                             Belum ada peserta.
+
                         </td>
+
                     </tr>
+
 
                 </tbody>
 
+
             </table>
 
+
         </div>
+
+
 
         <button
             class="danger"
@@ -290,6 +643,8 @@
 
         </button>
 
+
+
         <button
             class="secondary"
             onclick="kembaliKeQR()">
@@ -298,12 +653,17 @@
 
         </button>
 
+
     </section>
+
 
 </div>
 
 
+
 <script src="script.js"></script>
 
+
 </body>
+
 </html>
